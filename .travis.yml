@@ -5,4 +5,11 @@ install:
   - pip install requests
 # command to run tests
 script:
-  - <YOU PUT YOUR COMMAND HERE>
+  - class TestFunctions(unittest.TestCase):
+    def test_getHub_repo(self):
+        self.assertEqual(len(getHub_repo("richkempinski")), 5)
+        with self.assertRaises(ValueError):
+            getHub_repo("test__")
+
+    def test_getHub_repo(self):
+        self.assertEqual(number_commits("richkempinski", "helloworld"), 6)
