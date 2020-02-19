@@ -5,4 +5,4 @@ install:
   - pip install requests
 # command to run tests 
 script:
-  - pytest shahrani_HW04.py
+  - pytest Shahrani_HW04.py
