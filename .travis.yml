@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.8"
+install:
+  - pip install requests
+# command to run tests
+script:
+  - <YOU PUT YOUR COMMAND HERE>
