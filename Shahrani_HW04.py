@@ -6,23 +6,17 @@ import unittest
 
 class TestFunctions(unittest.TestCase):
 
-    def test_getHub_repo(self):
-        self.assertEqual(len(getHub_repo("richkempinski")), 5)
-        with self.assertRaises(ValueError):
-            getHub_repo("test__")
-
-    @mock.patch('requests.get')
-    def testGetNumberOfCommits(self, mockedReq):
-        mockedReq.return_value = MockResponse('[{”sha”:1}, {”sha”:2}…{”sha”:8}]')
-        commits = number_commits(self.user, self.repo)
-        self.assertEqual(len(commits), 8)
+    @mock.patch('Shahrani_HW04.number_commits')
+    def test_number_commits(self, mockedReq):
+        mockedReq.return_value = 6
+        self.assertEqual(number_commits("richkempinski", "helloworld"), 6)
 
 
 def getHub_repo(user_name):
     """ to get the names of the repositories in GetHub """
     output = []
     get_url = requests.get(f'https://api.github.com/users/{user_name}/repos')
-    repo_list = get_url.json()
+    repo_list = json.loads(get_url.text)
 
     try:
         for line in repo_list:
@@ -36,14 +30,13 @@ def getHub_repo(user_name):
 
 def number_commits(user_name, repo):
     """ to get the number of commits in a repository """
-    get_url = f'https://api.github.com/repos/{user_name}/{repo}/commits'
-    resp = requests.get(get_url)
-    commits = resp.text
-    repos = json.loads(commits)
-    result = []
-    for item in repos:
-        result.append(item['sha'])
-    return result
+    get_url = requests.get('https://api.github.com/repos/{}/{}/commits'.format(user_name, repo))
+    commits = json.loads(get_url.text)
+
+    if commits == 0:
+        print('the repo has no commits')
+
+    return len(commits)
 
 
 def main():
