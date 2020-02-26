@@ -1,16 +1,21 @@
+from unittest import mock
 import requests
 import json
 import unittest
 
 
 class TestFunctions(unittest.TestCase):
+
     def test_getHub_repo(self):
         self.assertEqual(len(getHub_repo("richkempinski")), 5)
         with self.assertRaises(ValueError):
             getHub_repo("test__")
 
-    def test_getHub_repo(self):
-        self.assertEqual(number_commits("richkempinski", "helloworld"), 6)
+    @mock.patch('requests.get')
+    def testGetNumberOfCommits(self, mockedReq):
+        mockedReq.return_value = MockResponse('[{”sha”:1}, {”sha”:2}…{”sha”:8}]')
+        commits = number_commits(self.user, self.repo)
+        self.assertEqual(len(commits), 8)
 
 
 def getHub_repo(user_name):
@@ -31,13 +36,14 @@ def getHub_repo(user_name):
 
 def number_commits(user_name, repo):
     """ to get the number of commits in a repository """
-    get_url = requests.get('https://api.github.com/repos/{}/{}/commits'.format(user_name, repo))
-    commits = get_url.json()
-
-    if commits == 0:
-        print('the repo has no commits')
-
-    return len(commits)
+    get_url = f'https://api.github.com/repos/{user_name}/{repo}/commits'
+    resp = requests.get(get_url)
+    commits = resp.text
+    repos = json.loads(commits)
+    result = []
+    for item in repos:
+        result.append(item['sha'])
+    return result
 
 
 def main():
